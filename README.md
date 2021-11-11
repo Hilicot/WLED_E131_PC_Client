@@ -1,5 +1,6 @@
 ## WLED_E131_PC_client
 
+![GUI screenshot](https://user-images.githubusercontent.com/42719353/141372480-06883e9d-6275-4762-a612-f58d3c02278e.png)
 
 This is a personal project to control from my computer my RGB led strip+ESP8266+WLED setup. It was not built for the general public, so I will add documentation/update it only if I need or if there are some requests to do it. The program was built on **Windows 10/11** with **Python 3.7** (but I might make it available for linux as well in the future)
 
