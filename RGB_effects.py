@@ -84,7 +84,7 @@ class RGBEffects:
         self.set_leds(self.past_states[indices].flatten())
 
     def screen_mirroring(self):
-        color = screen_average()
+        color = screen_average(self.gvars)
         data = np.tile(color,self.led_num).flatten()
         self.set_leds(data)
 

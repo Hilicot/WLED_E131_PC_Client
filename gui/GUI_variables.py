@@ -4,7 +4,7 @@ import numpy as np
 
 
 class IntVarSafe(IntVar):
-    """Variant of IntVar which never throws errors, but silently set itself to zero"""
+    """Variant of IntVar which never throws errors, but silently sets itself to zero"""
 
     def get(self):
         try:
@@ -15,6 +15,7 @@ class IntVarSafe(IntVar):
 
 class GUI_variables:
     # General tab variables
+    root = None
     mode = None
     color_generator_name = None
     console_output = None
@@ -30,6 +31,11 @@ class GUI_variables:
 
     # screen tab variables
     fullscreen = None
+    capture_width = None
+    capture_height = None
+    capture_x_offset = None
+    capture_y_offset = None
+
 
     def __init__(self, list_available_audio_devices_function):
         self.list_available_audio_devices = list_available_audio_devices_function

@@ -9,6 +9,7 @@ from .footer import draw_footer
 def draw_GUI(rgb_effects):
     root = Tk()
     root.title("E131 RGB controller")
+    rgb_effects.gvars.root = root
     tabControl = tk.Notebook(root)
 
     tab1 = tk.Frame(tabControl)
