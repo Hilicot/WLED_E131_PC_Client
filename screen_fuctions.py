@@ -6,7 +6,6 @@ from gui import GUI_variables
 # TODO provo a usare https://sighack.com/post/averaging-rgb-colors-the-right-way.
 #  Inoltre, il prodotto finale potrebbe avere come impostazioni la scelta tra detection statica,
 #  oppure con colori diversi a sinistra/destra (multi zona).
-#  poi l'utente deve anche scegliere la risoluzione/area da catturare
 
 w = 1920
 h = 1080
