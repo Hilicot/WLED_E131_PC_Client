@@ -83,13 +83,16 @@ class RGBEffects:
 
         # calculate actual leds
         distances = self.interpolate_distance_from_speakers(np.arange(self.led_num))
-        speed = max(self.gvars.speed.get()*5,1)
-        indices = (distances/speed).astype(int)
-        self.set_leds(self.past_states[indices].flatten())
+        speed = max(self.gvars.speed.get()*5, 1)
+        indices = distances/speed
+        floored_indices = np.floor(indices).astype(int)
+        partials = (indices - floored_indices).reshape([self.led_num, 1])
+        colors = self.past_states[floored_indices]*(1 - partials) + self.past_states[floored_indices + 1]*partials
+        self.set_leds(colors.flatten().astype(int))
 
     def screen_mirroring(self):
         color = screen_average(self.gvars)
-        data = np.tile(color,self.led_num).flatten()
+        data = np.tile(color, self.led_num).flatten()
         self.set_leds(data)
 
     """
@@ -133,7 +136,6 @@ class RGBEffects:
         # sets RGB function as data generator for the e131 module
         self.e131.set_rgb_function(self.mode_list[mode].RGBfunction)
 
-
     def get_modes(self):
         return self.mode_list.values()
 
@@ -150,18 +152,19 @@ class RGBEffects:
         self.e131.send_data(data*min(self.gvars.brightness.get(), 100)/100)
 
     def interpolate_distance_from_speakers(self, x):
-        return np.minimum(abs(x - self.gvars.speaker1.get()), abs(x - self.gvars.speaker2.get()))
+        return np.clip(np.minimum(abs(x - self.gvars.speaker1.get()), abs(x - self.gvars.speaker2.get())), 0,
+                       self.led_num - 2)  # clipped to led_num-2 to avoid IndexError in audio_speakers when speed = 0
 
     def set_ip(self):
         """
         set the ip stored inside the gvars object. Prints error message on console if IP is not valid
         """
         if all(x is not None for x in self.gvars.ip):
-            ip = list(map(lambda intvar:intvar.get(), self.gvars.ip))
-            if all(0<=x<256 for x in ip):
-                self.e131.set_ip('.'.join(map(str,ip)))
+            ip = list(map(lambda intvar: intvar.get(), self.gvars.ip))
+            if all(0 <= x < 256 for x in ip):
+                self.e131.set_ip('.'.join(map(str, ip)))
                 self.gvars.print_console("IP address updated")
             else:
-                self.gvars.print_console(str("invalid ip address: "+'.'.join(map(str,ip))))
+                self.gvars.print_console(str("invalid ip address: " + '.'.join(map(str, ip))))
         else:
-            self.gvars.print_console("invalid ip address: " + '.'.join(map(str,self.gvars.ip)))
+            self.gvars.print_console("invalid ip address: " + '.'.join(map(str, self.gvars.ip)))
