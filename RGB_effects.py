@@ -3,6 +3,7 @@ from typing import Dict, List
 from E131Module import E131Module
 import audio_functions
 from screen_fuctions import screen_average
+from time import sleep
 
 
 class RGBEffects:
@@ -16,7 +17,9 @@ class RGBEffects:
 
     # TODO audio_spectrum
     def __init__(self, gui_variables):
-        self.mode_list = {'off': Mode_info('off', 'off', lambda: None, setup_function=self.clear_leds),
+        # FIXME ideally 'off' mode would have as the normal RGB function a fucntion that does nothing (to reduce CPU performance).
+        #  However doing that sometimes it doesn't switch when using the update_widget() function.
+        self.mode_list = {'off': Mode_info('off', 'off', self.clear_leds, setup_function=self.clear_leds),
                           "rainbow": Mode_info('rainbow', "Rainbow", self.rainbow),
                           "screen_mirroring": Mode_info("screen_mirroring", 'Screen Mirroring', self.screen_mirroring),
                           "audio_static": Mode_info("audio_static", 'Audio Visualizer (Static)',
@@ -80,14 +83,14 @@ class RGBEffects:
 
         # calculate actual leds
         distances = self.interpolate_distance_from_speakers(np.arange(self.led_num))
-        indices = (distances*self.gvars.speed.get()/10).astype(int)
+        speed = max(self.gvars.speed.get()*5,1)
+        indices = (distances/speed).astype(int)
         self.set_leds(self.past_states[indices].flatten())
 
     def screen_mirroring(self):
         color = screen_average(self.gvars)
         data = np.tile(color,self.led_num).flatten()
         self.set_leds(data)
-
 
     """
     ### close functions
@@ -115,6 +118,9 @@ class RGBEffects:
     """
 
     def display_mode(self, mode: str = 'off'):
+        # stop previous function
+        self.e131.set_rgb_function(lambda: None)
+
         # run close function of the previous mode
         self.mode_list[self.prev_mode].close_function()
 
@@ -126,6 +132,7 @@ class RGBEffects:
 
         # sets RGB function as data generator for the e131 module
         self.e131.set_rgb_function(self.mode_list[mode].RGBfunction)
+
 
     def get_modes(self):
         return self.mode_list.values()

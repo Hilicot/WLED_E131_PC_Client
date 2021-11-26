@@ -1,6 +1,6 @@
 from tkinter import N, S, E, W, Tk, StringVar, Frame, Button
 from tkinter import ttk as tk
-from .GUI_variables import IntVarSafe
+from .GUI_variables import IntVarSafe, WidgetSubdomain, update_widgets
 
 
 def draw_tab_general(rgb_effects, tab, row=0):
@@ -18,7 +18,8 @@ def draw_tab_general(rgb_effects, tab, row=0):
     mode_radio_btns = []
     for m in rgb_effects.get_modes():
         radio_btn = tk.Radiobutton(master=tab1_top_frame, text=m.label, variable=gvars.mode, value=m.name,
-                                   command=lambda: rgb_effects.display_mode(gvars.mode.get()))
+                                   command=lambda: update_widgets(gvars, gvars.root,
+                                                                  lambda: rgb_effects.display_mode(gvars.mode.get())))
         radio_btn.grid(row=row, column=0, sticky=W, padx=(15, 0))
         mode_radio_btns.append(radio_btn)
         row += 1
@@ -45,7 +46,7 @@ def draw_tab_general(rgb_effects, tab, row=0):
     gray = '#fafafa'
     gray_frame = Frame(master=tab, background=gray)
     gray_frame['borderwidth'] = 1
-    gray_frame['relief'] = 'sunken'
+    gray_frame['relief'] = 'groove'
     gray_frame.grid(row=row, column=0, padx=(5, 5), pady=(10, 10))
     row += 1
     tk.Label(gray_frame, text='Global Options:', background=gray).grid(row=row, column=0, sticky=(W, E))
@@ -75,7 +76,7 @@ def draw_tab_general(rgb_effects, tab, row=0):
     """
     #       Brightness + Speed
     """
-
+    # TODO switch to sliders instead of IntEntry
     gvars.brightness = IntVarSafe(options_frame, 40)
     tk.Label(options_frame, text="Brightness (max 100)", background=gray).grid(row=row, column=0, sticky=(W, E))
     tk.Entry(master=options_frame, text=gvars.brightness, width=10).grid(row=row, column=1, sticky=(W, E))

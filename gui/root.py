@@ -4,6 +4,7 @@ from tkinter import ttk as tk
 from .tab_general import draw_tab_general
 from .tab_screen_mirroring import draw_tab_screen_mirroring
 from .footer import draw_footer
+from .GUI_variables import update_widgets
 
 
 def draw_GUI(rgb_effects):
@@ -27,5 +28,6 @@ def draw_GUI(rgb_effects):
     """function to run at startup after the gui is defined"""
     rgb_effects.set_ip()
     rgb_effects.gvars.print_console("Ready")
+    update_widgets(rgb_effects.gvars, root)
 
     return root
