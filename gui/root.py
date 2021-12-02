@@ -1,12 +1,34 @@
-from tkinter import Tk
-from tkinter import ttk as tk
+from PyQt5.QtWidgets import QApplication,QWidget,QTabWidget,QDialog,QStyleFactory,QVBoxLayout,QLabel
 
-from .tab_general import draw_tab_general
+from .tab_general import TabGeneral
 from .tab_screen_mirroring import draw_tab_screen_mirroring
 from .footer import draw_footer
 from .GUI_variables import update_widgets
 
 
+class ApplicationGUI(QDialog):
+
+    def __init__(self, rgb_effects, parent=None):
+        super(ApplicationGUI, self).__init__(parent)
+
+        self.originalPalette = QApplication.palette()
+        self.setWindowTitle("E131 RGB controller")
+        QApplication.setStyle(QStyleFactory.create("Fusion"))
+        # TODO add possibiliy to chose dark fusion palette (google for it)
+        QApplication.setPalette(QApplication.style().standardPalette())
+        self.layout = QVBoxLayout(self)
+
+        self.tabs = QTabWidget()
+        self.tab_general = TabGeneral(self, rgb_effects)
+        self.tab_screen = QWidget()
+
+        self.tabs.addTab(self.tab_general,"General")
+        self.tabs.addTab(self.tab_screen, "Screen Mirroring")
+
+        self.layout.addWidget(self.tabs)
+        self.setLayout(self.layout)
+
+"""
 def draw_GUI(rgb_effects):
     root = Tk()
     root.title("E131 RGB controller")
@@ -25,9 +47,8 @@ def draw_GUI(rgb_effects):
 
     draw_footer(rgb_effects, root, 1)
 
-    """function to run at startup after the gui is defined"""
     rgb_effects.set_ip()
     rgb_effects.gvars.print_console("Ready")
     update_widgets(rgb_effects.gvars, root)
 
-    return root
+    return root"""

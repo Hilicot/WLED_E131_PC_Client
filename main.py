@@ -1,13 +1,15 @@
-from tkinter import N, S, E, W, Tk, StringVar, TclError, Frame, Button
-from tkinter import ttk as tk
+from PyQt5.QtWidgets import QApplication
 from RGB_effects import *
-from gui import GUI_variables, draw_GUI
+from gui import GUI_variables, ApplicationGUI
 from audio_functions import list_available_audio_devices
+import sys
 
-gvars = GUI_variables(list_available_audio_devices)
-rgb_effects = RGBEffects(gvars)
+if __name__ == '__main__':
+    # TODO remove?
+    gvars = GUI_variables(list_available_audio_devices)
+    rgb_effects = RGBEffects(gvars)
 
-root = draw_GUI(rgb_effects)
-
-# actual GUI loop
-root.mainloop()
+    app = QApplication(sys.argv)
+    gallery = ApplicationGUI(rgb_effects)
+    gallery.show()
+    sys.exit(app.exec_())

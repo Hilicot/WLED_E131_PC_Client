@@ -1,8 +1,117 @@
-from tkinter import N, S, E, W, Tk, StringVar, Frame, Button
-from tkinter import ttk as tk
-from .GUI_variables import IntVarSafe, WidgetSubdomain, update_widgets
+from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QHBoxLayout, QVBoxLayout, QRadioButton, QComboBox, \
+    QColorDialog, QPushButton, QStyleFactory, QGroupBox, QSpinBox,QSlider
+from PyQt5.QtGui import QColor
+from PyQt5.QtCore import Qt
+
+from .GUI_variables import GUI_variables, WidgetSubdomain, update_widgets
+import numpy as np
 
 
+class TabGeneral(QWidget):
+    topLeftGroupBox = None
+    topRightGroupBox = None
+    bottomGroupBox = None
+
+    ColorPickerBtn = None
+
+    def __init__(self, parent, rgb_effects):
+        super(TabGeneral, self).__init__(parent)
+        self.rgb_effects = rgb_effects
+
+        self.createTopLeftGroupBox()
+        self.createTopRightGroupBox()
+        self.createBottomGroupBox()
+
+        tabLayout = QGridLayout()
+        tabLayout.addWidget(self.topLeftGroupBox, 0, 0)
+        tabLayout.addWidget(self.topRightGroupBox, 0, 1)
+        tabLayout.addWidget(self.bottomGroupBox, 1, 0, 1, 2)
+
+        self.setLayout(tabLayout)
+
+    def createTopLeftGroupBox(self):
+        self.topLeftGroupBox = QGroupBox("RGB mode:")
+        RGBSelectionRadio = []
+        for m in self.rgb_effects.get_modes():
+            RGBSelectionRadio.append(QRadioButton(m.label))
+        RGBSelectionRadio[0].setChecked(True)
+
+        topLeft = QVBoxLayout()
+        for radioBtn in RGBSelectionRadio:
+            topLeft.addWidget(radioBtn)
+        topLeft.addStretch(1)
+        self.topLeftGroupBox.setLayout(topLeft)
+
+    def createTopRightGroupBox(self):
+        self.topRightGroupBox = QGroupBox("Color:")
+        ColorGenerator = QComboBox()
+        ColorGenerator.addItems(self.rgb_effects.color_generators.keys())
+        self.ColorPickerBtn = QPushButton("")
+        self.ColorPickerBtn.setToolTip("Change base color")
+        self.ColorPickerBtn.clicked.connect(lambda: self.pick_color(rgb_effects.gvars))
+        self.ColorPickerBtn.setStyleSheet("* { background-color: " + self.rgb_effects.gvars.color_hex + "}")
+        if "Windows" in QStyleFactory.keys():
+            self.ColorPickerBtn.setStyle(QStyleFactory.create("Windows"))
+
+        topRight = QVBoxLayout()
+        topRight.addWidget(ColorGenerator)
+        topRight.addWidget(self.ColorPickerBtn)
+        topRight.addStretch(1)
+        self.topRightGroupBox.setLayout(topRight)
+
+    def createBottomGroupBox(self):
+        self.bottomGroupBox = QGroupBox("Global Options:")
+        LedNumLabel = QLabel("Led Number")
+        LedNumEntry = QSpinBox()
+        LedNumEntry.setMinimum(1)
+        LedNumEntry.setMaximum(1500)
+        LedNumEntry.setValue(300)
+        LedNumEntry.setToolTip("Specify the number of leds to drive")
+        Speaker1Label = QLabel("Speaker 1")
+        Speaker1Entry = QSpinBox()
+        Speaker1Label.setToolTip(
+            "Position of the first emulated speaker for Audio Visualization (must be a the index of an existing LED)")
+        Speaker1Entry.setMinimum(0)
+        Speaker1Entry.setMaximum(1500)
+        Speaker1Entry.setValue(0)
+        Speaker2Label = QLabel("Speaker 2")
+        Speaker2Entry = QSpinBox()
+        Speaker2Label.setToolTip(
+            "Position of the second emulated speaker for Audio Visualization (must be a the index of an existing LED)")
+        Speaker2Entry.setMinimum(0)
+        Speaker2Entry.setMaximum(1500)
+        Speaker2Entry.setValue(0)
+
+        BrightnessIcon = QLabel('<html><img src="gui/icons/lightbulb24"></html>')
+        BrightnessSlider = QSlider(Qt.Vertical)
+        BrightnessSlider.setValue(40)
+        SpeedIcon = QLabel('<html><img src="gui/icons/deadline24"></html>')
+        SpeedSlider = QSlider(Qt.Vertical)
+        SpeedSlider.setMaximum(500)
+        SpeedSlider.setValue(10)
+
+        bottomLayout = QGridLayout()
+        bottomLayout.addWidget(LedNumLabel, 0, 0)
+        bottomLayout.addWidget(LedNumEntry, 0, 1)
+        bottomLayout.addWidget(Speaker1Label,1,0)
+        bottomLayout.addWidget(Speaker1Entry, 1, 1)
+        bottomLayout.addWidget(Speaker2Label, 2, 0)
+        bottomLayout.addWidget(Speaker2Entry, 2,1)
+        bottomLayout.addWidget(BrightnessSlider, 0, 2, 2, 1)
+        bottomLayout.addWidget(BrightnessIcon, 2, 2)
+        bottomLayout.addWidget(SpeedSlider, 0, 3, 2, 1)
+        bottomLayout.addWidget(SpeedIcon, 2, 3)
+        self.bottomGroupBox.setLayout(bottomLayout)
+
+    def pick_color(self, gvars: GUI_variables):
+        color = QColorDialog.getColor()
+        gvars.color = np.array(color.getRgb())[:3]
+        gvars.color_hex = color.name()
+        # update color of color picker button
+        self.ColorPickerBtn.setStyleSheet("* { background-color: " + gvars.color_hex + "}")
+
+
+# TODO remove
 def draw_tab_general(rgb_effects, tab, row=0):
     gvars = rgb_effects.gvars
 

@@ -1,4 +1,4 @@
-from .root import draw_GUI
+from .root import ApplicationGUI
 from .GUI_variables import GUI_variables
 
 __author__ = 'Porro Marco'

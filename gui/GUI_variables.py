@@ -1,7 +1,7 @@
-from tkinter import TclError, IntVar
-from tkinter.colorchooser import askcolor
 import numpy as np
 
+from tkinter import W, Frame, LabelFrame, N, W, BooleanVar, StringVar, IntVar
+from tkinter import ttk as tk
 
 class IntVarSafe(IntVar):
     """Variant of IntVar which never throws errors, but silently sets itself to zero"""
