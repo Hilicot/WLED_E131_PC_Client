@@ -1,9 +1,7 @@
 from PyQt5.QtWidgets import QApplication,QWidget,QTabWidget,QDialog,QStyleFactory,QVBoxLayout,QLabel
 
 from .tab_general import TabGeneral
-from .tab_screen_mirroring import draw_tab_screen_mirroring
 from .footer import draw_footer
-from .GUI_variables import update_widgets
 
 
 class ApplicationGUI(QDialog):

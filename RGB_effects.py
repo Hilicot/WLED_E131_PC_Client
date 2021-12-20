@@ -49,7 +49,7 @@ class RGBEffects:
     def setup_audio_stream(self):
         self.portaudio = audio_functions.pyaudio.PyAudio()
         self.audio_stream, self.audio_rate = audio_functions.start_audio_stream(self.portaudio,
-                                                                                self.gvars.audio_device.get())
+                                                                                self.gvars.audio_device)
         self.past_states = np.zeros([self.led_num, 3])
 
     """
@@ -61,7 +61,7 @@ class RGBEffects:
             [hsv2rgb(h%256, 255, 255) for h in range(int(self.mode_counter), int(self.mode_counter + self.led_num))])
         data = data.flatten()
         self.set_leds(data)
-        self.mode_counter += self.gvars.speed.get()/10
+        self.mode_counter += self.gvars.speed/10
 
     def audio_static(self):
         audio_ratio, self.mode_counter, self.mode_counter2 = audio_functions.get_normalized_audio_level(
@@ -83,7 +83,7 @@ class RGBEffects:
 
         # calculate actual leds
         distances = self.interpolate_distance_from_speakers(np.arange(self.led_num))
-        speed = max(self.gvars.speed.get()*5, 1)
+        speed = max(self.gvars.speed*5, 1)
         indices = distances/speed
         floored_indices = np.floor(indices).astype(int)
         partials = (indices - floored_indices).reshape([self.led_num, 1])
@@ -145,14 +145,14 @@ class RGBEffects:
 
     def update_color_generator(self):
         if self.gvars.color_generator_name is not None:
-            self.color_generator = self.color_generators[self.gvars.color_generator_name.get()]
+            self.color_generator = self.color_generators[self.gvars.color_generator_name]
 
     def set_leds(self, data: np.ndarray):
         # cap brightness
-        self.e131.send_data(data*min(self.gvars.brightness.get(), 100)/100)
+        self.e131.send_data(data*min(self.gvars.brightness, 100)/100)
 
     def interpolate_distance_from_speakers(self, x):
-        return np.clip(np.minimum(abs(x - self.gvars.speaker1.get()), abs(x - self.gvars.speaker2.get())), 0,
+        return np.clip(np.minimum(abs(x - self.gvars.speaker1), abs(x - self.gvars.speaker2)), 0,
                        self.led_num - 2)  # clipped to led_num-2 to avoid IndexError in audio_speakers when speed = 0
 
     def set_ip(self):
@@ -160,7 +160,7 @@ class RGBEffects:
         set the ip stored inside the gvars object. Prints error message on console if IP is not valid
         """
         if all(x is not None for x in self.gvars.ip):
-            ip = list(map(lambda intvar: intvar.get(), self.gvars.ip))
+            ip = list(map(lambda intvar: intvar, self.gvars.ip))
             if all(0 <= x < 256 for x in ip):
                 self.e131.set_ip('.'.join(map(str, ip)))
                 self.gvars.print_console("IP address updated")

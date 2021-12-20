@@ -12,7 +12,9 @@ CHUNK = 4096
 FORMAT = pyaudio.paInt16
 PLOT_MAX_FREQUENCY_SHOWN = 1500
 
+
 def start_audio_stream(p, audio_device: str) -> tuple:
+    # FIXME audio not working on Linux -> fix or use other framework instead of pyaudio
     useloopback = False
 
     # Get device info
@@ -96,6 +98,7 @@ def list_available_audio_devices() -> tuple:
     p = pyaudio.PyAudio()
     devices = []
     default_device = ""
+    default_device_id = 0
     for i in range(0, p.get_device_count()):
         info = p.get_device_info_by_index(i)
         device_label = info["name"] + "," + p.get_host_api_info_by_index(info["hostApi"])["name"]
@@ -107,11 +110,15 @@ def list_available_audio_devices() -> tuple:
                 - first available device (any)
                 - ""
                 """
-        if (p.get_host_api_info_by_index(info["hostApi"])["name"]).find("WASAPI") != -1:
-            if info['name'].find("Speakers (Realtek(R) Audio)") != -1:
-                default_device = device_label
-            if default_device == "":
-                default_device = device_label
+        # TODO On windows select only WASAPI devices, on Linux show all
+        #if (p.get_host_api_info_by_index(info["hostApi"])["name"]).find("WASAPI") != -1:
+        if info['name'].find("Speakers (Realtek(R) Audio)") != -1:
+            default_device = device_label
+            default_device_id = i
+        if default_device == "":
+            default_device = device_label
+            default_device_id = i
+
     p.terminate()
 
-    return devices, default_device
+    return devices, default_device, default_device_id
