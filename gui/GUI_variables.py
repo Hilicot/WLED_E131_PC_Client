@@ -1,18 +1,4 @@
 import numpy as np
-from tkinter.colorchooser import askcolor
-
-from tkinter import W, Frame, LabelFrame, N, W, BooleanVar, StringVar, IntVar
-from tkinter import ttk as tk
-
-
-class IntVarSafe(IntVar):
-    """Variant of IntVar which never throws errors, but silently sets itself to zero"""
-
-    def get(self):
-        try:
-            return super().get()
-        except:
-            return 0
 
 
 class GUI_variables:
@@ -39,15 +25,8 @@ class GUI_variables:
     capture_x_offset = None
     capture_y_offset = None
 
-    def __init__(self, list_available_audio_devices_function):
-        self.list_available_audio_devices = list_available_audio_devices_function
-
-    def choose_color(self, button):
-        color_tuple = askcolor(title="Choose color")
-        self.color = np.array(color_tuple[0])
-        self.color_hex = color_tuple[1]
-        self.hue = rgb2hsv(self.color[0], self.color[1], self.color[2])[0]
-        button['bg'] = self.color_hex
+    def __init__(self, rgb_effects):
+        self.rgb_effects = rgb_effects
 
     def print_console(self, message: str):
         self.console_output.set(message)
@@ -71,6 +50,9 @@ class GUI_variables:
     def setSpeed(self, speed: int):
         self.speed = speed
 
-    def setAudioDeviceFromIndex(self, audio_index:str):
-        self.audio_device = self.list_available_audio_devices[audio_index]
+    def setColorGenerator(self, generator_name: str = "Static"):
+        self.color_generator_name = generator_name
+        self.rgb_effects.update_color_generator()
 
+    def setAudioDeviceFromIndex(self, audio_index: str):
+        self.audio_device = self.rgb_effects.list_available_audio_devices[audio_index]

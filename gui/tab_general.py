@@ -46,13 +46,15 @@ class TabGeneral(QWidget):
         self.topLeftGroupBox.setLayout(topLeft)
 
     def createTopRightGroupBox(self):
+        gvars: GUI_variables = self.rgb_effects.gvars
         self.topRightGroupBox = QGroupBox("Color:")
         ColorGenerator = QComboBox()
         ColorGenerator.addItems(self.rgb_effects.color_generators.keys())
+        ColorGenerator.currentTextChanged.connect(gvars.setColorGenerator)
         self.ColorPickerBtn = QPushButton("")
         self.ColorPickerBtn.setToolTip("Change base color")
-        self.ColorPickerBtn.clicked.connect(lambda: self.pick_color(self.rgb_effects.gvars))
-        self.ColorPickerBtn.setStyleSheet("* { background-color: " + self.rgb_effects.gvars.color_hex + "}")
+        self.ColorPickerBtn.clicked.connect(lambda: self.pick_color(gvars))
+        self.ColorPickerBtn.setStyleSheet("* { background-color: " + gvars.color_hex + "}")
         # set button style to "Windows" to avoid Fusion's colored overlay
         if "Windows" in QStyleFactory.keys():
             self.ColorPickerBtn.setStyle(QStyleFactory.create("Windows"))
@@ -102,7 +104,7 @@ class TabGeneral(QWidget):
 
         AudioDeviceLabel = QLabel("Audio Device")
         AudioDeviceDropdown = QComboBox()
-        devices, default_device, default_device_id = gvars.list_available_audio_devices()
+        devices, default_device, default_device_id = self.rgb_effects.get_audio_device_list()
         AudioDeviceDropdown.addItems(devices)
         AudioDeviceDropdown.setCurrentIndex(default_device_id)
         gvars.audio_device = default_device

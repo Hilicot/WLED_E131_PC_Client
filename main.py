@@ -5,9 +5,8 @@ from audio_functions import list_available_audio_devices
 import sys
 
 if __name__ == '__main__':
-    # TODO remove?
-    gvars = GUI_variables(list_available_audio_devices)
-    rgb_effects = RGBEffects(gvars)
+    rgb_effects = RGBEffects()
+    gvars = rgb_effects.gvars
 
     app = QApplication(sys.argv)
     gallery = ApplicationGUI(rgb_effects)

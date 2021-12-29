@@ -3,7 +3,7 @@ from typing import Dict, List
 from E131Module import E131Module
 import audio_functions
 from screen_fuctions import screen_average
-from time import sleep
+from gui.GUI_variables import GUI_variables
 
 
 class RGBEffects:
@@ -14,10 +14,12 @@ class RGBEffects:
     hue_shift = 0
     color_generator = lambda x: None
     past_states = None
+    get_audio_device_list = audio_functions.list_available_audio_devices
 
     # TODO audio_spectrum
-    def __init__(self, gui_variables):
-        # FIXME ideally 'off' mode would have as the normal RGB function a fucntion that does nothing (to reduce CPU performance).
+    def __init__(self):
+        # FIXME ideally 'off' mode would have as the normal RGB function a fucntion that does nothing
+        #  (to reduce CPU performance).
         #  However doing that sometimes it doesn't switch when using the update_widget() function.
         self.mode_list = {'off': Mode_info('off', 'off', self.clear_leds, setup_function=self.clear_leds),
                           "rainbow": Mode_info('rainbow', "Rainbow", self.rainbow),
@@ -33,7 +35,7 @@ class RGBEffects:
             "Static": self.color_generator_static,
             "Rainbow": self.color_generator_rainbow
         }
-        self.gvars = gui_variables
+        self.gvars = GUI_variables(self)
         self.update_color_generator()
         self.mode_counter = self.mode_counter2 = 0
         self.e131 = E131Module(self.led_num)
@@ -58,16 +60,16 @@ class RGBEffects:
 
     def rainbow(self):
         data = np.array(
-            [hsv2rgb(h%256, 255, 255) for h in range(int(self.mode_counter), int(self.mode_counter + self.led_num))])
+            [hsv2rgb(h % 256, 255, 255) for h in range(int(self.mode_counter), int(self.mode_counter + self.led_num))])
         data = data.flatten()
         self.set_leds(data)
-        self.mode_counter += self.gvars.speed/10
+        self.mode_counter += self.gvars.speed / 10
 
     def audio_static(self):
         audio_ratio, self.mode_counter, self.mode_counter2 = audio_functions.get_normalized_audio_level(
             self.audio_stream, self.mode_counter, self.mode_counter2)
         color = self.color_generator()
-        data = np.tile(audio_ratio*color,
+        data = np.tile(audio_ratio * color,
                        self.led_num)  # get color of one pixel given the base color,then repeat
         self.set_leds(data)
 
@@ -79,15 +81,15 @@ class RGBEffects:
 
         # use self.past_states as a FIFO queue to store past states
         self.past_states = np.roll(self.past_states, 1, axis=0)
-        self.past_states[0] = audio_ratio*color
+        self.past_states[0] = audio_ratio * color
 
         # calculate actual leds
         distances = self.interpolate_distance_from_speakers(np.arange(self.led_num))
-        speed = max(self.gvars.speed*5, 1)
-        indices = distances/speed
+        speed = max(self.gvars.speed * 5, 1)
+        indices = distances / speed
         floored_indices = np.floor(indices).astype(int)
         partials = (indices - floored_indices).reshape([self.led_num, 1])
-        colors = self.past_states[floored_indices]*(1 - partials) + self.past_states[floored_indices + 1]*partials
+        colors = self.past_states[floored_indices] * (1 - partials) + self.past_states[floored_indices + 1] * partials
         self.set_leds(colors.flatten().astype(int))
 
     def screen_mirroring(self):
@@ -113,7 +115,7 @@ class RGBEffects:
 
     def color_generator_rainbow(self) -> np.ndarray:
         color = hsv2rgb(int(self.hue_shift), 255, 255)
-        self.hue_shift = (self.hue_shift + self.gvars.speed.get()/10)%256
+        self.hue_shift = (self.hue_shift + self.gvars.speed / 10) % 256
         return color
 
     """
@@ -149,7 +151,7 @@ class RGBEffects:
 
     def set_leds(self, data: np.ndarray):
         # cap brightness
-        self.e131.send_data(data*min(self.gvars.brightness, 100)/100)
+        self.e131.send_data(data * min(self.gvars.brightness, 100) / 100)
 
     def interpolate_distance_from_speakers(self, x):
         return np.clip(np.minimum(abs(x - self.gvars.speaker1), abs(x - self.gvars.speaker2)), 0,

@@ -4,7 +4,6 @@ import numpy as np
 import platform
 from typing import Union, Any
 
-
 DEBUG = False
 
 CHUNK = 1024
@@ -13,7 +12,6 @@ PLOT_MAX_FREQUENCY_SHOWN = 1500
 
 
 def start_audio_stream(p, audio_device: str) -> tuple:
-    # FIXME audio not working on Linux -> fix or use other framework instead of pyaudio
     useloopback = False
 
     # Get device info
@@ -53,12 +51,13 @@ def start_audio_stream(p, audio_device: str) -> tuple:
     return stream, rate
 
 
-def get_audio_level(stream, bits:int = 4096):
+def get_audio_level(stream, bits: int = 4096):
     data = np.frombuffer(stream.read(bits), np.int16)
     return np.max(data)
 
 
-def get_normalized_audio_level(stream, max_level, min_level, max_sensitivity=1500, max_threshold=0.6, max_decay=0.01,min_sensitivity=1000, min_threshold=0.6, min_decay=0.1) -> Union[Any,int]:
+def get_normalized_audio_level(stream, max_level, min_level, max_sensitivity=1500, max_threshold=0.6, max_decay=0.01,
+                               min_sensitivity=1000, min_threshold=0.6, min_decay=0.1) -> Union[Any, int]:
     """
     return normalized audio_level
 
@@ -78,30 +77,30 @@ def get_normalized_audio_level(stream, max_level, min_level, max_sensitivity=150
     # decrease a bit the max audio level only if audio_level is under the threshold
     if audio_level > max_level:
         max_level = audio_level
-    elif audio_level < max_level*max_threshold:
-        max_level -= max_decay*(max_level - audio_level)
-    max_level = max(max_level,max_sensitivity)
+    elif audio_level < max_level * max_threshold:
+        max_level -= max_decay * (max_level - audio_level)
+    max_level = max(max_level, max_sensitivity)
 
     # do the same for min_level
     if audio_level < min_level:
         min_level = audio_level
-    elif audio_level*min_threshold > min_level:
-        min_level += min_decay*(audio_level - min_level)
-    min_level = min(min_level,min_sensitivity)
+    elif audio_level * min_threshold > min_level:
+        min_level += min_decay * (audio_level - min_level)
+    min_level = min(min_level, min_sensitivity)
 
-    return (audio_level-min_level)/(max_level-min_level), max_level, min_level
+    return (audio_level - min_level) / (max_level - min_level), max_level, min_level
 
 
 def get_audio_spectrum(stream, rate):
-    num_bins = int(min(CHUNK//2, np.floor(PLOT_MAX_FREQUENCY_SHOWN*CHUNK/rate)))
+    num_bins = int(min(CHUNK // 2, np.floor(PLOT_MAX_FREQUENCY_SHOWN * CHUNK / rate)))
     data = np.frombuffer(stream.read(CHUNK), np.int16)
     fft_data = fft(data)
-    norm_data = fft_data/CHUNK
+    norm_data = fft_data / CHUNK
     magnitudes = np.abs(norm_data[range(num_bins)])
     return magnitudes
 
 
-def list_available_audio_devices() -> tuple:
+def list_available_audio_devices(*args, **kwargs) -> tuple:
     p = pyaudio.PyAudio()
     devices = []
     default_device = ""
@@ -118,7 +117,7 @@ def list_available_audio_devices() -> tuple:
                 - ""
                 """
         # TODO On windows select only WASAPI devices, on Linux show all
-        #if (p.get_host_api_info_by_index(info["hostApi"])["name"]).find("WASAPI") != -1:
+        # if (p.get_host_api_info_by_index(info["hostApi"])["name"]).find("WASAPI") != -1:
         if info['name'].find("Speakers (Realtek(R) Audio)") != -1:
             default_device = device_label
             default_device_id = i
