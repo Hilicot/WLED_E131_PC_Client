@@ -72,7 +72,7 @@ class TabGeneral(QWidget):
         LedNumEntry.setMaximum(1500)
         LedNumEntry.setValue(gvars.num_leds)
         LedNumEntry.setToolTip("Specify the number of leds to drive")
-        LedNumEntry.valueChanged.connect(lambda: gvars.setNumLeds(LedNumLabel.value))
+        LedNumEntry.valueChanged.connect(gvars.setNumLeds)
         Speaker1Label = QLabel("Speaker 1")
         Speaker1Entry = QSpinBox()
         Speaker1Label.setToolTip(
@@ -80,7 +80,7 @@ class TabGeneral(QWidget):
         Speaker1Entry.setMinimum(0)
         Speaker1Entry.setMaximum(1500)
         Speaker1Entry.setValue(gvars.speaker1)
-        Speaker1Entry.valueChanged.connect(lambda: gvars.setSpeaker1(Speaker1Entry.value))
+        Speaker1Entry.valueChanged.connect(gvars.setSpeaker1)
         Speaker2Label = QLabel("Speaker 2")
         Speaker2Entry = QSpinBox()
         Speaker2Label.setToolTip(
@@ -88,17 +88,17 @@ class TabGeneral(QWidget):
         Speaker2Entry.setMinimum(0)
         Speaker2Entry.setMaximum(1500)
         Speaker2Entry.setValue(gvars.speaker1)
-        Speaker2Entry.valueChanged.connect(lambda: gvars.setSpeaker2(Speaker2Entry.value))
+        Speaker2Entry.valueChanged.connect(gvars.setSpeaker2)
 
         BrightnessIcon = QLabel('<html><img src="gui/icons/lightbulb24"></html>')
         BrightnessSlider = QSlider(Qt.Vertical)
         BrightnessSlider.setValue(gvars.brightness)
-        BrightnessSlider.valueChanged.connect(lambda: gvars.setBrightness(BrightnessSlider.value))
+        BrightnessSlider.valueChanged.connect(gvars.setBrightness)
         SpeedIcon = QLabel('<html><img src="gui/icons/deadline24"></html>')
         SpeedSlider = QSlider(Qt.Vertical)
-        SpeedSlider.setMaximum(500)
+        SpeedSlider.setMaximum(100)
         SpeedSlider.setValue(gvars.speed)
-        SpeedSlider.valueChanged.connect(lambda: gvars.setSpeed(SpeedSlider.value))
+        SpeedSlider.valueChanged.connect(gvars.setSpeed)
 
         AudioDeviceLabel = QLabel("Audio Device")
         AudioDeviceDropdown = QComboBox()
@@ -106,8 +106,7 @@ class TabGeneral(QWidget):
         AudioDeviceDropdown.addItems(devices)
         AudioDeviceDropdown.setCurrentIndex(default_device_id)
         gvars.audio_device = default_device
-        AudioDeviceDropdown.currentIndexChanged.connect(
-            lambda: gvars.setAudioDeviceFromIndex(AudioDeviceDropdown.currentIndex()))
+        AudioDeviceDropdown.currentIndexChanged.connect(gvars.setAudioDeviceFromIndex)
 
         bottomLayout = QGridLayout()
         bottomLayout.addWidget(LedNumLabel, 0, 0)

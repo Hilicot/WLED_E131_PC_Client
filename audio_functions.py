@@ -1,14 +1,13 @@
 import pyaudio  # installed pyaudio fork with wheel (https://github.com/intxcc/pyaudio_portaudio/releases)
 from scipy.fft import fft
 import numpy as np
-from numpy import array, diff, where, split
-import os
+import platform
 from typing import Union, Any
 
 
 DEBUG = False
 
-CHUNK = 4096
+CHUNK = 1024
 FORMAT = pyaudio.paInt16
 PLOT_MAX_FREQUENCY_SHOWN = 1500
 
@@ -27,21 +26,29 @@ def start_audio_stream(p, audio_device: str) -> tuple:
             "name"] == api_name:
             break
 
-    # Choose between loopback or standard mode
-    is_input = device_info["maxInputChannels"] > 0
-    if not is_input:
-        useloopback = True;
-
     channelcount = max(device_info["maxOutputChannels"], device_info["maxInputChannels"])
     rate = int(device_info["defaultSampleRate"])
 
-    stream = p.open(format=FORMAT,
-                    channels=channelcount,
-                    rate=rate,
-                    input=True,
-                    frames_per_buffer=CHUNK,
-                    input_device_index=device_info["index"],
-                    as_loopback=useloopback)
+    if platform.system() == "Wndows":
+        # Choose between loopback or standard mode
+        is_input = device_info["maxInputChannels"] > 0
+        if not is_input:
+            useloopback = True;
+
+        stream = p.open(format=FORMAT,
+                        channels=channelcount,
+                        rate=rate,
+                        input=True,
+                        frames_per_buffer=CHUNK,
+                        input_device_index=device_info["index"],
+                        as_loopback=useloopback)
+    else:
+        stream = p.open(format=FORMAT,
+                        channels=channelcount,
+                        rate=rate,
+                        input=True,
+                        frames_per_buffer=CHUNK,
+                        input_device_index=device_info["index"])
 
     return stream, rate
 
