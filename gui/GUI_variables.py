@@ -56,8 +56,8 @@ class ScreenVariables:
     fullscreen = False
     capture_width = 960
     capture_height = 540
-    capture_x_offset = 0
-    capture_y_offset = 0
+    capture_x_offset = 480
+    capture_y_offset = 270
 
     def setScreenMode(self, mode: str):
         self.screen_mode = mode

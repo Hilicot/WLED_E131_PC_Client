@@ -1,9 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QHBoxLayout, QVBoxLayout, QRadioButton, QComboBox, \
     QColorDialog, QPushButton, QStyleFactory, QGroupBox, QSpinBox, QSlider, QCheckBox, QApplication
 from PyQt5.QtCore import Qt
-from sys import argv
 
-from .GUI_variables import GUI_variables, ScreenVariables
+from .GUI_variables import ScreenVariables
 
 
 class TabScreen(QWidget):
@@ -36,6 +35,7 @@ class TabScreen(QWidget):
         FullscreenCheckbox = QCheckBox("Fullscreen")
         FullscreenCheckbox.stateChanged.connect(lambda state: svars.setFullScreen(state == Qt.Checked))
 
+        # TODO set default capture area based on screen size
         """
         screen_size = QApplication(argv)
         screen_size = QApplication(argv).screen_size.desktop().screenGeometry()
