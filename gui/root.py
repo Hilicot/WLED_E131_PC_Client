@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QApplication,QWidget,QTabWidget,QDialog,QStyleFactory,QVBoxLayout,QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QTabWidget, QDialog, QStyleFactory, QVBoxLayout, QLabel
 
 from .tab_general import TabGeneral
+from .tab_screen_mirroring import TabScreen
 from .footer import draw_footer
 
 
@@ -18,13 +19,14 @@ class ApplicationGUI(QDialog):
 
         self.tabs = QTabWidget()
         self.tab_general = TabGeneral(self, rgb_effects)
-        self.tab_screen = QWidget()
+        self.tab_screen = TabScreen(self, rgb_effects)
 
-        self.tabs.addTab(self.tab_general,"General")
+        self.tabs.addTab(self.tab_general, "General")
         self.tabs.addTab(self.tab_screen, "Screen Mirroring")
 
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
+
 
 """
 def draw_GUI(rgb_effects):

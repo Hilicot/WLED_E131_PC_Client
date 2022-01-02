@@ -3,10 +3,11 @@ from scipy.fft import fft
 import numpy as np
 import platform
 from typing import Union, Any
+import os
 
 DEBUG = False
 
-CHUNK = 1024
+CHUNK = 2048
 FORMAT = pyaudio.paInt16
 PLOT_MAX_FREQUENCY_SHOWN = 1500
 
@@ -27,7 +28,7 @@ def start_audio_stream(p, audio_device: str) -> tuple:
     channelcount = max(device_info["maxOutputChannels"], device_info["maxInputChannels"])
     rate = int(device_info["defaultSampleRate"])
 
-    if platform.system() == "Wndows":
+    if platform.system() == "Windows":
         # Choose between loopback or standard mode
         is_input = device_info["maxInputChannels"] > 0
         if not is_input:
@@ -41,6 +42,8 @@ def start_audio_stream(p, audio_device: str) -> tuple:
                         input_device_index=device_info["index"],
                         as_loopback=useloopback)
     else:
+        # create a loopback monitor to record the sound (if using PulseAudio)
+        os.system('pacmd load-module module-loopback latency_msec=0')
         stream = p.open(format=FORMAT,
                         channels=channelcount,
                         rate=rate,

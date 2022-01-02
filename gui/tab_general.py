@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QHBoxLayout, QVBoxLayout, QRadioButton, QComboBox, \
     QColorDialog, QPushButton, QStyleFactory, QGroupBox, QSpinBox, QSlider
-from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 
 from .GUI_variables import GUI_variables

@@ -17,16 +17,9 @@ class GUI_variables:
     brightness = 40
     ip = [192, 168, 1, 213]
 
-    # screen tab variables
-    screen_mode = None
-    fullscreen = None
-    capture_width = None
-    capture_height = None
-    capture_x_offset = None
-    capture_y_offset = None
-
     def __init__(self, rgb_effects):
         self.rgb_effects = rgb_effects
+        self.svars = ScreenVariables()
 
     def print_console(self, message: str):
         self.console_output.set(message)
@@ -55,4 +48,31 @@ class GUI_variables:
         self.rgb_effects.update_color_generator()
 
     def setAudioDeviceFromIndex(self, audio_index: str):
-        self.audio_device = self.rgb_effects.list_available_audio_devices[audio_index]
+        self.audio_device = self.rgb_effects.get_audio_device_list()[0][audio_index]
+
+
+class ScreenVariables:
+    screen_mode = 'Average'
+    fullscreen = False
+    capture_width = 960
+    capture_height = 540
+    capture_x_offset = 0
+    capture_y_offset = 0
+
+    def setScreenMode(self, mode: str):
+        self.screen_mode = mode
+
+    def setFullScreen(self, fullscreen: bool):
+        self.fullscreen = fullscreen
+
+    def setWidth(self, width: int):
+        self.capture_width = width
+
+    def setHeight(self, height: int):
+        self.capture_height = height
+
+    def setXOffset(self, offset: int):
+        self.capture_x_offset = offset
+
+    def setyOffset(self, offset: int):
+        self.capture_y_offset = offset
