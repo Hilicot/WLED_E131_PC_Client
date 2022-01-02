@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class GUI_variables:
     # General tab variables
     root = None
