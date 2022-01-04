@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QHBoxLayout, QVBoxLayo
 from PyQt5.QtCore import Qt
 
 from .GUI_variables import GUI_variables
+from .tab_screen_mirroring import TabScreen
 import numpy as np
 
 
@@ -15,6 +16,7 @@ class TabGeneral(QWidget):
 
     def __init__(self, parent, rgb_effects):
         super(TabGeneral, self).__init__(parent)
+        self.parent = parent
         self.rgb_effects = rgb_effects
         self.RGBSelectionRadio = []
 
@@ -138,4 +140,5 @@ class TabGeneral(QWidget):
             if radio[0].isChecked():
                 mode = radio[1]
                 break
+        self.parent.tab_screen.enableUI(mode == "screen_mirroring")
         self.rgb_effects.gvars.setMode(self.rgb_effects, mode)
