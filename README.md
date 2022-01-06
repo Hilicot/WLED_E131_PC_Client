@@ -2,7 +2,10 @@
 
 ![GUI screenshot](https://user-images.githubusercontent.com/42719353/141372480-06883e9d-6275-4762-a612-f58d3c02278e.png)
 
-This is a personal project to control from my computer my RGB led strip+ESP8266+WLED setup. It was not built for the general public, so I will add documentation/update it only if I need or if there are some requests to do it. The program was built on **Windows 10/11** with **Python 3.7** (but I might make it available for linux as well in the future)
+This is a personal project to control from my computer my RGB led strip+ESP8266+WLED setup. 
+It was not built for the general public, so I will add documentation/update it only if I need or 
+if there are some requests to do it. 
+The program was built on **Windows 10/11/Ubuntu 20.04** with **Python 3.7**
 
 ### Basic concepts:
 
@@ -12,7 +15,7 @@ This is a personal project to control from my computer my RGB led strip+ESP8266+
     + Rainbow
     + Audio Visualizer
     + Screen Mirroring
-- Tkinter GUI
+- PyQt5 GUI
 
 ---
 
@@ -31,8 +34,8 @@ At the moment, there is no extensive documentation on all the available features
 
 ### Installation
 
-Right now the code is not properly tested and validated, so binaries are not publicly available.<br>
-Follow these instructions to install all the needed python libraries and run it in Python (the code is written for Python 3.7, other version should work fine as well)
+Follow these instructions to install all the needed python libraries and run it in Python 
+(the code is written for Python 3.7, other versions may work fine as well)
 
 1. (Optional) create a venv or Conda environment
 1.  Install the dependencies using the `requirements.txt` file:
@@ -55,11 +58,8 @@ Follow these instructions to install all the needed python libraries and run it 
           sudo apt-get install ffmpeg libav-tools
         ``` 
       + if it still doesn't work, try building portaudio using [these instructions](https://stackoverflow.com/a/35593426)
-      + If later you see that no audio device is actually detecting the computer audio, you can create an audio monitor (https://stackoverflow.com/a/56612274)  
-    
-1. On Debian/Ubuntu, Tkinter is not shipped with Python, so install it with 
-   ```shell
-      sudo apt-get install python3.7-tk
-      ```
+      + If later you see that no audio device is actually detecting the computer audio, you can create an audio monitor (https://stackoverflow.com/a/56612274)
 
- To run it, run `main.py` with Python. Again, I have no idea how it behaves on different machines, so be ready to work a bit to fix eventual errors. If you have problems, send a message in the issue section. 
+ To run it, run `main.py` with Python. Again, I have no idea how it behaves on different machines, 
+ so be ready to work a bit to fix eventual errors. 
+ If you have problems, send a message in the issue section. 
