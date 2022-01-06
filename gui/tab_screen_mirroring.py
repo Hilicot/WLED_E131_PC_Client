@@ -15,6 +15,7 @@ class TabScreen(QWidget):
 
     def __init__(self, parent, rgb_effects):
         super(TabScreen, self).__init__(parent)
+        self.parent = parent
         self.rgb_effects = rgb_effects
         svars: ScreenVariables = rgb_effects.gvars.svars
 
@@ -22,8 +23,8 @@ class TabScreen(QWidget):
         # WIDGETS
         ####
 
-        ActiveCheckbox = QCheckBox("Screen Mirroring")
-        ActiveCheckbox.stateChanged.connect(self.activateScreenRecording)
+        self.ActiveCheckbox = QCheckBox("Screen Mirroring")
+        self.ActiveCheckbox.stateChanged.connect(self.activateScreenRecording)
 
         self.OptionsBox = QGroupBox()
 
@@ -95,7 +96,7 @@ class TabScreen(QWidget):
         self.OptionsBox.setLayout(optionsLayout)
 
         tabLayout = QGridLayout()
-        tabLayout.addWidget(ActiveCheckbox, 0, 0)
+        tabLayout.addWidget(self.ActiveCheckbox, 0, 0)
         tabLayout.addWidget(self.OptionsBox, 1, 0)
 
         self.setLayout(tabLayout)
@@ -106,9 +107,26 @@ class TabScreen(QWidget):
 
         :param state:
         """
-        if state == Qt.Checked:
-            self.rgb_effects.gvars.setMode(self.rgb_effects, 'screen_mirroring')
-            self.OptionsBox.setEnabled(True)
+        registered_mode = self.rgb_effects.gvars.mode
+        if registered_mode not in ('screen_mirroring','off'):
+            mode = registered_mode
         else:
-            self.rgb_effects.gvars.setMode(self.rgb_effects, 'off')
-            self.OptionsBox.setEnabled(False)
+            mode = 'screen_mirroring' if state else 'off'
+
+        # set the mode
+        self.rgb_effects.gvars.setMode(self.rgb_effects, mode)
+
+        # (GUI) check the appropriate radio button in the general tab
+        for i, radio in enumerate(self.parent.tab_general.RGBSelectionRadio):
+            if radio[1] == mode:
+                radio[0].setChecked(True)
+                break
+
+        # (GUI) enable/disable this tab
+        self.OptionsBox.setEnabled(state)
+
+    def enableUI(self, state):
+        self.OptionsBox.setEnabled(state)
+        self.ActiveCheckbox.blockSignals(True) # prevent triggering activateScreenRecording(state)
+        self.ActiveCheckbox.setChecked(state)
+        self.ActiveCheckbox.blockSignals(False)
