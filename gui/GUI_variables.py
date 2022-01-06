@@ -1,4 +1,5 @@
 import numpy as np
+from screeninfo import get_monitors
 
 class GUI_variables:
     # General tab variables
@@ -52,17 +53,22 @@ class GUI_variables:
 
 class ScreenVariables:
     screen_mode = 'Average'
+    saturation_boost = 100
     fullscreen = False
-    capture_width = 960
-    capture_height = 540
-    capture_x_offset = 480
-    capture_y_offset = 270
+    screen = get_monitors()[0]
+    capture_width = int(screen.width/2)
+    capture_height = int(screen.height/2)
+    capture_x_offset = int(screen.width/4)
+    capture_y_offset = int(screen.height/4)
 
     def setScreenMode(self, mode: str):
         self.screen_mode = mode
 
     def setFullScreen(self, fullscreen: bool):
         self.fullscreen = fullscreen
+
+    def setSaturationBoost(self, saturation_boost: int):
+        self.saturation_boost = saturation_boost
 
     def setWidth(self, width: int):
         self.capture_width = width

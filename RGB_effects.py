@@ -18,10 +18,7 @@ class RGBEffects:
 
     # TODO audio_spectrum
     def __init__(self):
-        # FIXME ideally 'off' mode would have as the normal RGB function a fucntion that does nothing
-        #  (to reduce CPU performance).
-        #  However doing that sometimes it doesn't switch when using the update_widget() function.
-        self.mode_list = {'off': Mode_info('off', 'off', self.clear_leds, setup_function=self.clear_leds),
+        self.mode_list = {'off': Mode_info('off', 'off', lambda: None, setup_function=self.clear_leds),
                           "rainbow": Mode_info('rainbow', "Rainbow", self.rainbow),
                           "screen_mirroring": Mode_info("screen_mirroring", 'Screen Mirroring', self.screen_mirroring),
                           "audio_static": Mode_info("audio_static", 'Audio Visualizer (Static)',

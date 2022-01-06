@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QHBoxLayout, QVBoxLayo
     QColorDialog, QPushButton, QStyleFactory, QGroupBox, QSpinBox, QSlider, QCheckBox, QApplication
 from PyQt5.QtCore import Qt
 
+from screeninfo import get_monitors
 from .GUI_variables import ScreenVariables
 
 
@@ -32,39 +33,43 @@ class TabScreen(QWidget):
         ScreenModeDropdown.setCurrentText('Average')
         ScreenModeDropdown.currentIndexChanged.connect(svars.setScreenMode)
 
+        SaturationBoostLabel = QLabel("Saturation Boost")
+        SaturationBoostEntry = QSpinBox()
+        SaturationBoostEntry.setMinimum(-255)
+        SaturationBoostEntry.setMaximum(255)
+        SaturationBoostEntry.setValue(svars.saturation_boost)
+        SaturationBoostEntry.setToolTip("increase/decrease the saturation")
+        SaturationBoostEntry.valueChanged.connect(svars.setSaturationBoost)
         FullscreenCheckbox = QCheckBox("Fullscreen")
-        FullscreenCheckbox.stateChanged.connect(lambda state: svars.setFullScreen(state == Qt.Checked))
+        FullscreenCheckbox.stateChanged.connect(svars.setFullScreen)
 
-        # TODO set default capture area based on screen size
-        """
-        screen_size = QApplication(argv)
-        screen_size = QApplication(argv).screen_size.desktop().screenGeometry()
-"""
+        screen = get_monitors()[0]
+
         WidthLabel = QLabel("Width")
         WidthEntry = QSpinBox()
         WidthEntry.setMinimum(1)
-        WidthEntry.setMaximum(1920)
+        WidthEntry.setMaximum(screen.width)
         WidthEntry.setValue(svars.capture_width)
         WidthEntry.setToolTip("Insert the width (in pixels) of the capture area")
         WidthEntry.valueChanged.connect(svars.setWidth)
         HeightLabel = QLabel("Height")
         HeightEntry = QSpinBox()
         HeightEntry.setMinimum(1)
-        HeightEntry.setMaximum(1080)
+        HeightEntry.setMaximum(screen.height)
         HeightEntry.setValue(svars.capture_width)
         HeightEntry.setToolTip("Insert the height (in pixels) of the capture area")
         HeightEntry.valueChanged.connect(svars.setHeight)
         XOffsetLabel = QLabel("X offset")
         XOffsetEntry = QSpinBox()
         XOffsetEntry.setMinimum(0)
-        XOffsetEntry.setMaximum(1920 - 1)
+        XOffsetEntry.setMaximum(screen.width - 1)
         XOffsetEntry.setValue(svars.capture_x_offset)
         XOffsetEntry.setToolTip("Horizontal offset (in pixels) from the left edge of the screen")
         XOffsetEntry.valueChanged.connect(svars.setXOffset)
         YOffsetLabel = QLabel("Y offset")
         YOffsetEntry = QSpinBox()
         YOffsetEntry.setMinimum(0)
-        YOffsetEntry.setMaximum(1080 - 1)
+        YOffsetEntry.setMaximum(screen.height - 1)
         YOffsetEntry.setValue(svars.capture_y_offset)
         YOffsetEntry.setToolTip("Vertical offset (in pixels) from the top edge of the screen")
         YOffsetEntry.valueChanged.connect(svars.setyOffset)
@@ -76,15 +81,17 @@ class TabScreen(QWidget):
         optionsLayout = QGridLayout()
         optionsLayout.addWidget(ScreenModeLabel, 0, 0)
         optionsLayout.addWidget(ScreenModeDropdown, 0, 1)
-        optionsLayout.addWidget(FullscreenCheckbox, 1, 0)
-        optionsLayout.addWidget(WidthLabel, 2, 0)
-        optionsLayout.addWidget(WidthEntry, 2, 1)
-        optionsLayout.addWidget(HeightLabel, 3, 0)
-        optionsLayout.addWidget(HeightEntry, 3, 1)
-        optionsLayout.addWidget(XOffsetLabel, 4, 0)
-        optionsLayout.addWidget(XOffsetEntry, 4, 1)
-        optionsLayout.addWidget(YOffsetLabel, 5, 0)
-        optionsLayout.addWidget(YOffsetEntry, 5, 1)
+        optionsLayout.addWidget(SaturationBoostLabel, 1, 0)
+        optionsLayout.addWidget(SaturationBoostEntry, 1, 1)
+        optionsLayout.addWidget(FullscreenCheckbox, 2, 0)
+        optionsLayout.addWidget(WidthLabel, 3, 0)
+        optionsLayout.addWidget(WidthEntry, 3, 1)
+        optionsLayout.addWidget(HeightLabel, 4, 0)
+        optionsLayout.addWidget(HeightEntry, 4, 1)
+        optionsLayout.addWidget(XOffsetLabel, 5, 0)
+        optionsLayout.addWidget(XOffsetEntry, 5, 1)
+        optionsLayout.addWidget(YOffsetLabel, 6, 0)
+        optionsLayout.addWidget(YOffsetEntry, 6, 1)
         self.OptionsBox.setLayout(optionsLayout)
 
         tabLayout = QGridLayout()

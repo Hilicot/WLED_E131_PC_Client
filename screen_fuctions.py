@@ -18,10 +18,10 @@ def screen_average(svars: ScreenVariables) -> np.ndarray:
     """
 
     # TODO try implementing in C code to see if it run faster
-    # TODO implement FullScreen
-    screen = np.array(ImageGrab.grab(bbox=(svars.capture_x_offset, svars.capture_y_offset,
-                                           svars.capture_width + svars.capture_x_offset,
-                                           svars.capture_height + svars.capture_y_offset)))
+    bbox = None if svars.fullscreen else (svars.capture_x_offset, svars.capture_y_offset,
+                                          svars.capture_width + svars.capture_x_offset,
+                                          svars.capture_height + svars.capture_y_offset)
+    screen = np.array(ImageGrab.grab(bbox=bbox))
 
     if svars.screen_mode == "Fast":  # calculate average considering only a part of the pixels
         avg = np.mean(screen[::8, ::8, :], axis=(0, 1)).astype(np.uint8)
@@ -32,6 +32,6 @@ def screen_average(svars: ScreenVariables) -> np.ndarray:
 
     # boost saturation
     hsv = rgb2hsv(*avg)
-    rgb = hsv2rgb(hsv[0], min(hsv[1] + 50, 255), hsv[2])
+    rgb = hsv2rgb(hsv[0], min(hsv[1] + int(svars.saturation_boost), 255), hsv[2])
 
     return rgb

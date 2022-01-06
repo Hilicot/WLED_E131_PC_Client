@@ -104,10 +104,12 @@ def get_audio_spectrum(stream, rate):
 
 
 def list_available_audio_devices(*args, **kwargs) -> tuple:
-    p = pyaudio.PyAudio()
+
     devices = []
     default_device = ""
     default_device_id = 0
+    p = pyaudio.PyAudio()
+
     for i in range(0, p.get_device_count()):
         info = p.get_device_info_by_index(i)
         device_label = info["name"] + "," + p.get_host_api_info_by_index(info["hostApi"])["name"]
@@ -119,14 +121,13 @@ def list_available_audio_devices(*args, **kwargs) -> tuple:
                 - first available device (any)
                 - ""
                 """
-        # TODO On windows select only WASAPI devices, on Linux show all
-        # if (p.get_host_api_info_by_index(info["hostApi"])["name"]).find("WASAPI") != -1:
-        if info['name'].find("Speakers (Realtek(R) Audio)") != -1:
-            default_device = device_label
-            default_device_id = i
-        if default_device == "":
-            default_device = device_label
-            default_device_id = i
+        if platform.system() != "Windows" or (p.get_host_api_info_by_index(info["hostApi"])["name"]).find("WASAPI") != -1:
+            if info['name'].find("Speakers (Realtek(R) Audio)") != -1:
+                default_device = device_label
+                default_device_id = i
+            if default_device == "":
+                default_device = device_label
+                default_device_id = i
 
     p.terminate()
 
