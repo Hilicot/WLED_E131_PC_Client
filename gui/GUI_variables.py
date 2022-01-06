@@ -1,86 +1,83 @@
-from tkinter import TclError, IntVar
-from tkinter.colorchooser import askcolor
 import numpy as np
-
-
-class IntVarSafe(IntVar):
-    """Variant of IntVar which never throws errors, but silently sets itself to zero"""
-
-    def get(self):
-        try:
-            return super().get()
-        except TclError:
-            return 0
-
+from screeninfo import get_monitors
 
 class GUI_variables:
     # General tab variables
     root = None
-    mode = None
-    widget_subdomains = dict()
-    color_generator_name = None
+    mode = 'off'
+    color_generator_name = "Static"
     console_output = None
-    num_leds = None
-    speed = None
+    num_leds = 300
     audio_device = None
     color = np.array([255, 0, 0])
     color_hex = "#ff0000"
     hue = 0
-    speaker1 = speaker2 = None
-    brightness = None
-    ip = [None, None, None, None]
+    speed = 10
+    speaker1 = speaker2 = 0
+    brightness = 40
+    ip = [192, 168, 1, 213]
 
-    # screen tab variables
-    screen_mode = None
-    fullscreen = None
-    capture_width = None
-    capture_height = None
-    capture_x_offset = None
-    capture_y_offset = None
-
-    def __init__(self, list_available_audio_devices_function):
-        self.list_available_audio_devices = list_available_audio_devices_function
-
-    def choose_color(self, button):
-        color_tuple = askcolor(title="Choose color")
-        self.color = np.array(color_tuple[0])
-        self.color_hex = color_tuple[1]
-        self.hue = rgb2hsv(self.color[0], self.color[1], self.color[2])[0]
-        button['bg'] = self.color_hex
+    def __init__(self, rgb_effects):
+        self.rgb_effects = rgb_effects
+        self.svars = ScreenVariables()
 
     def print_console(self, message: str):
         self.console_output.set(message)
 
+    def setMode(self, rgb_effects, mode: str):
+        self.mode = mode
+        rgb_effects.display_mode(mode)
 
-class WidgetSubdomain:
-    def __init__(self, controller_widget, enabled_value):
-        self.enabled_value = enabled_value
-        self.controller_widget = controller_widget
+    def setNumLeds(self, num: int):
+        self.num_leds = num
 
-    def isEnabled(self) -> bool:
-        return self.controller_widget.get() == self.enabled_value
+    def setSpeaker1(self, position: int):
+        self.speaker1 = position
+
+    def setSpeaker2(self, position: int):
+        self.speaker2 = position
+
+    def setBrightness(self, position: int):
+        self.speaker1 = position
+
+    def setSpeed(self, speed: int):
+        self.speed = speed
+
+    def setColorGenerator(self, generator_name: str = "Static"):
+        self.color_generator_name = generator_name
+        self.rgb_effects.update_color_generator()
+
+    def setAudioDeviceFromIndex(self, audio_index: str):
+        self.audio_device = self.rgb_effects.get_audio_device_list()[0][audio_index]
 
 
-def update_widgets(gvars: GUI_variables, root_widget, starting_function=lambda: None, enable=True):
-    """
-    Recursively descend in the widget tree from the starting_widget down. Each time a WidgetSubdomain is met,
-    set all it's children to enabled or disabled based on their condition
+class ScreenVariables:
+    screen_mode = 'Average'
+    saturation_boost = 100
+    fullscreen = False
+    screen = get_monitors()[0]
+    capture_width = int(screen.width/2)
+    capture_height = int(screen.height/2)
+    capture_x_offset = int(screen.width/4)
+    capture_y_offset = int(screen.height/4)
 
-    :param gvars:
-    :param root_widget: the search starts from this widget
-    :param starting_function: function to execute at the start. Can be unrelated, it's just handy for function chaining
-    :param enable: if True enables all widgets, else disables them
-    """
-    starting_function()
+    def setScreenMode(self, mode: str):
+        self.screen_mode = mode
 
-    for w in root_widget.winfo_children():
-        if w in gvars.widget_subdomains:
-            subdom = gvars.widget_subdomains[w]
-            update_widgets(gvars, w, enable=enable and subdom.isEnabled())
-        elif "state" in w.keys():
-            if enable:
-                w["state"] = "normal"
-            else:
-                w["state"] = "disabled"
-        elif len(w.winfo_children()) > 0:
-            update_widgets(gvars, w, enable=enable)
+    def setFullScreen(self, fullscreen: bool):
+        self.fullscreen = fullscreen
+
+    def setSaturationBoost(self, saturation_boost: int):
+        self.saturation_boost = saturation_boost
+
+    def setWidth(self, width: int):
+        self.capture_width = width
+
+    def setHeight(self, height: int):
+        self.capture_height = height
+
+    def setXOffset(self, offset: int):
+        self.capture_x_offset = offset
+
+    def setyOffset(self, offset: int):
+        self.capture_y_offset = offset

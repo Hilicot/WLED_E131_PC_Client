@@ -1,16 +1,16 @@
 import pyaudio  # installed pyaudio fork with wheel (https://github.com/intxcc/pyaudio_portaudio/releases)
 from scipy.fft import fft
 import numpy as np
-from numpy import array, diff, where, split
-import os
+import platform
 from typing import Union, Any
-
+import os
 
 DEBUG = False
 
-CHUNK = 4096
+CHUNK = 2048
 FORMAT = pyaudio.paInt16
 PLOT_MAX_FREQUENCY_SHOWN = 1500
+
 
 def start_audio_stream(p, audio_device: str) -> tuple:
     useloopback = False
@@ -25,31 +25,42 @@ def start_audio_stream(p, audio_device: str) -> tuple:
             "name"] == api_name:
             break
 
-    # Choose between loopback or standard mode
-    is_input = device_info["maxInputChannels"] > 0
-    if not is_input:
-        useloopback = True;
-
     channelcount = max(device_info["maxOutputChannels"], device_info["maxInputChannels"])
     rate = int(device_info["defaultSampleRate"])
 
-    stream = p.open(format=FORMAT,
-                    channels=channelcount,
-                    rate=rate,
-                    input=True,
-                    frames_per_buffer=CHUNK,
-                    input_device_index=device_info["index"],
-                    as_loopback=useloopback)
+    if platform.system() == "Windows":
+        # Choose between loopback or standard mode
+        is_input = device_info["maxInputChannels"] > 0
+        if not is_input:
+            useloopback = True;
+
+        stream = p.open(format=FORMAT,
+                        channels=channelcount,
+                        rate=rate,
+                        input=True,
+                        frames_per_buffer=CHUNK,
+                        input_device_index=device_info["index"],
+                        as_loopback=useloopback)
+    else:
+        # create a loopback monitor to record the sound (if using PulseAudio)
+        os.system('pacmd load-module module-loopback latency_msec=0')
+        stream = p.open(format=FORMAT,
+                        channels=channelcount,
+                        rate=rate,
+                        input=True,
+                        frames_per_buffer=CHUNK,
+                        input_device_index=device_info["index"])
 
     return stream, rate
 
 
-def get_audio_level(stream, bits:int = 4096):
+def get_audio_level(stream, bits: int = 4096):
     data = np.frombuffer(stream.read(bits), np.int16)
     return np.max(data)
 
 
-def get_normalized_audio_level(stream, max_level, min_level, max_sensitivity=1500, max_threshold=0.6, max_decay=0.01,min_sensitivity=1000, min_threshold=0.6, min_decay=0.1) -> Union[Any,int]:
+def get_normalized_audio_level(stream, max_level, min_level, max_sensitivity=1500, max_threshold=0.6, max_decay=0.01,
+                               min_sensitivity=1000, min_threshold=0.6, min_decay=0.1) -> Union[Any, int]:
     """
     return normalized audio_level
 
@@ -69,33 +80,36 @@ def get_normalized_audio_level(stream, max_level, min_level, max_sensitivity=150
     # decrease a bit the max audio level only if audio_level is under the threshold
     if audio_level > max_level:
         max_level = audio_level
-    elif audio_level < max_level*max_threshold:
-        max_level -= max_decay*(max_level - audio_level)
-    max_level = max(max_level,max_sensitivity)
+    elif audio_level < max_level * max_threshold:
+        max_level -= max_decay * (max_level - audio_level)
+    max_level = max(max_level, max_sensitivity)
 
     # do the same for min_level
     if audio_level < min_level:
         min_level = audio_level
-    elif audio_level*min_threshold > min_level:
-        min_level += min_decay*(audio_level - min_level)
-    min_level = min(min_level,min_sensitivity)
+    elif audio_level * min_threshold > min_level:
+        min_level += min_decay * (audio_level - min_level)
+    min_level = min(min_level, min_sensitivity)
 
-    return (audio_level-min_level)/(max_level-min_level), max_level, min_level
+    return (audio_level - min_level) / (max_level - min_level), max_level, min_level
 
 
 def get_audio_spectrum(stream, rate):
-    num_bins = int(min(CHUNK//2, np.floor(PLOT_MAX_FREQUENCY_SHOWN*CHUNK/rate)))
+    num_bins = int(min(CHUNK // 2, np.floor(PLOT_MAX_FREQUENCY_SHOWN * CHUNK / rate)))
     data = np.frombuffer(stream.read(CHUNK), np.int16)
     fft_data = fft(data)
-    norm_data = fft_data/CHUNK
+    norm_data = fft_data / CHUNK
     magnitudes = np.abs(norm_data[range(num_bins)])
     return magnitudes
 
 
-def list_available_audio_devices() -> tuple:
-    p = pyaudio.PyAudio()
+def list_available_audio_devices(*args, **kwargs) -> tuple:
+
     devices = []
     default_device = ""
+    default_device_id = 0
+    p = pyaudio.PyAudio()
+
     for i in range(0, p.get_device_count()):
         info = p.get_device_info_by_index(i)
         device_label = info["name"] + "," + p.get_host_api_info_by_index(info["hostApi"])["name"]
@@ -107,11 +121,14 @@ def list_available_audio_devices() -> tuple:
                 - first available device (any)
                 - ""
                 """
-        if (p.get_host_api_info_by_index(info["hostApi"])["name"]).find("WASAPI") != -1:
+        if platform.system() != "Windows" or (p.get_host_api_info_by_index(info["hostApi"])["name"]).find("WASAPI") != -1:
             if info['name'].find("Speakers (Realtek(R) Audio)") != -1:
                 default_device = device_label
+                default_device_id = i
             if default_device == "":
                 default_device = device_label
+                default_device_id = i
+
     p.terminate()
 
-    return devices, default_device
+    return devices, default_device, default_device_id
