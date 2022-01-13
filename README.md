@@ -1,6 +1,6 @@
 ## WLED_E131_PC_client
 
-![GUI screenshot](https://user-images.githubusercontent.com/42719353/141372480-06883e9d-6275-4762-a612-f58d3c02278e.png)
+![image](https://user-images.githubusercontent.com/42719353/149409843-f34d37dc-2e6a-458c-8cdf-0cb4d023d870.png)
 
 This is a personal project to control from my computer my RGB led strip+ESP8266+WLED setup. 
 It was not built for the general public, so I will add documentation/update it only if I need or 
