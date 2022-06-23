@@ -29,7 +29,7 @@ The E131 communication is done thanks to the [sacn](https://github.com/Hundemeie
 
 At the moment, there is no extensive documentation on all the available features or on how to modify the code, but I think it is quite straightforward to understand. Feel free to ask for clarifications.
 
-### Installation
+### Build
 
 Right now the code is not properly tested and validated, so binaries are not publicly available.<br>
 Follow these instructions to install all the needed python libraries and run it in Python (the code is written for Python 3.7, other version should work fine as well)

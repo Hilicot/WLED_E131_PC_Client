@@ -4,7 +4,7 @@ from .tab_general import TabGeneral
 from .tab_screen_mirroring import TabScreen
 from .footer import draw_footer
 
-
+# FIXME close button not working
 class ApplicationGUI(QDialog):
 
     def __init__(self, rgb_effects, parent=None):

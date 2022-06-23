@@ -37,6 +37,7 @@ class RGBEffects:
         self.mode_counter = self.mode_counter2 = 0
         self.e131 = E131Module(self.led_num)
         self.prev_mode = 'off'
+        self.prev_audio_ratio = 0
 
     """
     ### setup functions
@@ -57,16 +58,17 @@ class RGBEffects:
 
     def rainbow(self):
         data = np.array(
-            [hsv2rgb(h % 256, 255, 255) for h in range(int(self.mode_counter), int(self.mode_counter + self.led_num))])
+            [hsv2rgb(h%256, 255, 255) for h in range(int(self.mode_counter), int(self.mode_counter + self.led_num))])
         data = data.flatten()
         self.set_leds(data)
-        self.mode_counter += self.gvars.speed / 10
+        self.mode_counter += self.gvars.speed/10
 
     def audio_static(self):
         audio_ratio, self.mode_counter, self.mode_counter2 = audio_functions.get_normalized_audio_level(
             self.audio_stream, self.mode_counter, self.mode_counter2)
-        color = self.color_generator()
-        data = np.tile(audio_ratio * color,
+
+        color = self.color_generator(audio_ratio)
+        data = np.tile(audio_ratio*color,
                        self.led_num)  # get color of one pixel given the base color,then repeat
         self.set_leds(data)
 
@@ -74,19 +76,19 @@ class RGBEffects:
         audio_ratio, self.mode_counter, self.mode_counter2 = audio_functions.get_normalized_audio_level(
             self.audio_stream, self.mode_counter, self.mode_counter2)
 
-        color = self.color_generator()
+        color = self.color_generator(audio_ratio)
 
         # use self.past_states as a FIFO queue to store past states
         self.past_states = np.roll(self.past_states, 1, axis=0)
-        self.past_states[0] = audio_ratio * color
+        self.past_states[0] = audio_ratio*color
 
         # calculate actual leds
         distances = self.interpolate_distance_from_speakers(np.arange(self.led_num))
-        speed = max(self.gvars.speed * 5, 1)
-        indices = distances / speed
+        speed = max(self.gvars.speed*5, 1)
+        indices = distances/speed
         floored_indices = np.floor(indices).astype(int)
         partials = (indices - floored_indices).reshape([self.led_num, 1])
-        colors = self.past_states[floored_indices] * (1 - partials) + self.past_states[floored_indices + 1] * partials
+        colors = self.past_states[floored_indices]*(1 - partials) + self.past_states[floored_indices + 1]*partials
         self.set_leds(colors.flatten().astype(int))
 
     def screen_mirroring(self):
@@ -107,12 +109,17 @@ class RGBEffects:
     ### color generators
     """
 
-    def color_generator_static(self):
+    def color_generator_static(self, audio_ratio=None):
         return self.gvars.color
 
-    def color_generator_rainbow(self) -> np.ndarray:
+    def color_generator_rainbow(self, audio_ratio=None) -> np.ndarray:
+        if audio_ratio is not None:
+            speed = max((audio_ratio - self.prev_audio_ratio) - 0.4, 0)*800
+            self.prev_audio_ratio = audio_ratio
+        else:
+            speed = self.gvars.speed
+        self.hue_shift = (self.hue_shift + speed/10)%256
         color = hsv2rgb(int(self.hue_shift), 255, 255)
-        self.hue_shift = (self.hue_shift + self.gvars.speed / 10) % 256
         return color
 
     """
@@ -148,7 +155,7 @@ class RGBEffects:
 
     def set_leds(self, data: np.ndarray):
         # cap brightness
-        self.e131.send_data(data * min(self.gvars.brightness, 100) / 100)
+        self.e131.send_data(data*min(self.gvars.brightness, 100)/100)
 
     def interpolate_distance_from_speakers(self, x):
         return np.clip(np.minimum(abs(x - self.gvars.speaker1), abs(x - self.gvars.speaker2)), 0,

@@ -52,6 +52,7 @@ class TabGeneral(QWidget):
         ColorGenerator = QComboBox()
         ColorGenerator.addItems(self.rgb_effects.color_generators.keys())
         ColorGenerator.currentTextChanged.connect(gvars.setColorGenerator)
+        ColorGenerator.setCurrentText("Rainbow")
         self.ColorPickerBtn = QPushButton("")
         self.ColorPickerBtn.setToolTip("Change base color")
         self.ColorPickerBtn.clicked.connect(lambda: self.pick_color(gvars))

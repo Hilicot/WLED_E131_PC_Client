@@ -4,8 +4,8 @@ from screeninfo import get_monitors
 class GUI_variables:
     # General tab variables
     root = None
-    mode = 'off'
-    color_generator_name = "Static"
+    mode = 'rainbow'
+    color_generator_name = "Rainbow"
     console_output = None
     num_leds = 300
     audio_device = None
@@ -37,8 +37,8 @@ class GUI_variables:
     def setSpeaker2(self, position: int):
         self.speaker2 = position
 
-    def setBrightness(self, position: int):
-        self.speaker1 = position
+    def setBrightness(self, brightness: int):
+        self.brightness = brightness
 
     def setSpeed(self, speed: int):
         self.speed = speed
