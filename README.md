@@ -56,10 +56,5 @@ Follow these instructions to install all the needed python libraries and run it 
         ``` 
       + if it still doesn't work, try building portaudio using [these instructions](https://stackoverflow.com/a/35593426)
       + If later you see that no audio device is actually detecting the computer audio, you can create an audio monitor (https://stackoverflow.com/a/56612274)  
-    
-1. On Debian/Ubuntu, Tkinter is not shipped with Python, so install it with 
-   ```shell
-      sudo apt-get install python3.7-tk
-      ```
 
  To run it, run `main.py` with Python. Again, I have no idea how it behaves on different machines, so be ready to work a bit to fix eventual errors. If you have problems, send a message in the issue section. 
