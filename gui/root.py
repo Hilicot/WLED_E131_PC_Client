@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QApplication, QWidget, QTabWidget, QDialog, QStyleFa
 
 from .tab_general import TabGeneral
 from .tab_screen_mirroring import TabScreen
-from .footer import draw_footer
 
 # FIXME close button not working
 class ApplicationGUI(QDialog):
@@ -27,28 +26,3 @@ class ApplicationGUI(QDialog):
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
 
-
-"""
-def draw_GUI(rgb_effects):
-    root = Tk()
-    root.title("E131 RGB controller")
-    rgb_effects.gvars.root = root
-    tabControl = tk.Notebook(root)
-
-    tab1 = tk.Frame(tabControl)
-    tabControl.add(tab1, text='General')
-    draw_tab_general(rgb_effects, tab1)
-
-    tab2 = tk.Frame(tabControl)
-    tabControl.add(tab2, text='Screen Mirroring')
-    draw_tab_screen_mirroring(rgb_effects, tab2)
-
-    tabControl.grid(row=0, column=0)
-
-    draw_footer(rgb_effects, root, 1)
-
-    rgb_effects.set_ip()
-    rgb_effects.gvars.print_console("Ready")
-    update_widgets(rgb_effects.gvars, root)
-
-    return root"""
