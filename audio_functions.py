@@ -94,11 +94,12 @@ def get_normalized_audio_level(stream, max_level, min_level, max_sensitivity=150
     return (audio_level - min_level) / (max_level - min_level), max_level, min_level
 
 
-def get_audio_spectrum(stream, rate):
-    num_bins = int(min(CHUNK // 2, np.floor(PLOT_MAX_FREQUENCY_SHOWN * CHUNK / rate)))
-    data = np.frombuffer(stream.read(CHUNK), np.int16)
+def get_audio_spectrum(stream, rate, samples):
+    chunk = samples*32
+    num_bins = int(min(chunk // 2, np.floor(PLOT_MAX_FREQUENCY_SHOWN * chunk / rate)))
+    data = np.frombuffer(stream.read(chunk), np.int16)
     fft_data = fft(data)
-    norm_data = fft_data / CHUNK
+    norm_data = fft_data / chunk
     magnitudes = np.abs(norm_data[range(num_bins)])
     return magnitudes
 
