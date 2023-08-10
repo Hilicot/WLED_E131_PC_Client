@@ -81,3 +81,8 @@ class ScreenVariables:
 
     def setyOffset(self, offset: int):
         self.capture_y_offset = offset
+
+class ScreenMode:
+    Fast = "Fast"
+    SquaredAverage = "Squared Average"
+    FastRatio = 8
